@@ -1,0 +1,25 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.9.0"}
+        ; db related
+        org.clojure/java.jdbc {:mvn/version "0.7.4"}
+        org.hsqldb/hsqldb {:mvn/version "2.4.0"}
+        ; validation
+        phrase {:mvn/version "0.1-alpha2"}
+        ; route / web server
+        bidi {:mvn/version "2.1.2"}
+        ring/ring-jetty-adapter {:mvn/version "1.6.3"}
+        org.slf4j/slf4j-nop {:mvn/version "1.7.25"}
+        cheshire {:mvn/version "5.8.0"}
+        ; template engine
+        org.thymeleaf/thymeleaf {:mvn/version "3.0.9.RELEASE"}
+        ; middleware
+        ring-webjars {:mvn/version "0.2.0"}
+        ; js/css resources
+        org.webjars/bootstrap {:mvn/version "3.3.6"}
+        org.webjars/jquery-ui {:mvn/version "1.11.4"}}
+ :aliases
+ {:test {:extra-paths ["test"]}
+  :editor {:extra-deps {nightlight {:mvn/version "2.1.0"}}}
+  :less {:extra-deps {com.github.sommeri/less4j {:mvn/version "1.17.2"}}}
+  :dev {:extra-deps {ring/ring-devel {:mvn/version "1.6.3"}}}}}
+  

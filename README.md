@@ -4,6 +4,8 @@ Revamp [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) i
 It is intended for developer to compare with the original PetClinic to get a feeling of how
 Clojure saving Java Developer from the black magic world but still keeping the productivity.
 
+![Simple Comparsion](simple_compare.png)
+
 ## Basic Structure
 
 ### Data Model

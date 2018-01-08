@@ -4,6 +4,7 @@
             [ring.adapter.jetty :as jetty]
             [ring.middleware.webjars :as webjars]
             [ring.middleware.resource :as resource]
+            [ring.middleware.content-type :as content-type]
             [ring.middleware.params :as params]
             [ring.middleware.reload :as reload]
             [ring.middleware.stacktrace :as stacktrace]
@@ -26,6 +27,7 @@
     (resource/wrap-resource "static")
     (webjars/wrap-webjars "/webjars")
     (params/wrap-params)
+    (content-type/wrap-content-type)
     (wrap-bidi c/routes)))
 
 (defn -main [& args]

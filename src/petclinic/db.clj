@@ -1,7 +1,8 @@
 (ns petclinic.db
   (:require [clojure.java.jdbc :as j]
             [clojure.walk :as walk]
-            [clojure.set :as set]))
+            [clojure.set :as set])
+  (:import [org.hsqldb.jdbc JDBCPool]))
 
 (defn row->obj [rows spec]
   (let [{:keys [cols names specs single]} spec
@@ -20,7 +21,9 @@
       (first rs)
       rs)))
 
-(def db-spec {:connection-uri "jdbc:hsqldb:file:testdb"})  
+;(def db-spec {:connection-uri "jdbc:hsqldb:file:testdb"})  
+(def db-spec {:datasource (doto (JDBCPool.)
+                                (.setUrl "jdbc:hsqldb:file:testdb"))})
 
 (defn create-owner [owner]
   (let [new-owner (dissoc owner :id)]

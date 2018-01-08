@@ -1,11 +1,26 @@
 (ns petclinic.db
   (:require [clojure.java.jdbc :as j]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.set :as set]))
 
-(def db-spec {:connection-uri "jdbc:hsqldb:file:testdb"})
+(defn row->obj [rows spec]
+  (let [{:keys [cols names specs single]} spec
+        renames (if names (zipmap cols names))
+        objs-rows (group-by #(select-keys % cols) rows)
+        rs (map
+             (fn [[obj rows-per-obj]]
+               (let [o (into obj
+                         (for [[k spec-body] specs]
+                           [k (row->obj rows-per-obj spec-body)]))]
+                 (if renames
+                   (set/rename-keys o renames)
+                   o)))
+             objs-rows)]
+    (if single
+      (first rs)
+      rs)))
 
-(defn new-owner []
-  {:new true})
+(def db-spec {:connection-uri "jdbc:hsqldb:file:testdb"})  
 
 (defn create-owner [owner]
   (let [new-owner (dissoc owner :id)]
@@ -16,43 +31,76 @@
     (j/update! db-spec :owners new-owner ["id = ?" id])))
 
 (defn show-owner [owner-id]
-  (let [owner (first (j/query db-spec ["select * from owners where id = ?" owner-id]))
-        raw-pets (j/query db-spec ["select p.*, t.name as type, v.pet_id, v.visit_date, v.description
-                                           from pets p 
-                                           left join types t on p.type_id = t.id 
-                                           left join visits v on p.id = v.pet_id
-                                           where owner_id = ?" owner-id])
-        pets-groups (group-by #(select-keys % [:id :name :type :birth_date :owner_id :type_id]) raw-pets)
-        pets (map (fn [v]
-                    (let [sp (map #(select-keys % [:visit_date :pet_id :description]) 
-                                  (get pets-groups v))]
-                      (assoc v :visits sp)))
-               (keys pets-groups))]
-    (assoc owner :pets pets)))
+  (let [raw-owners (j/query db-spec ["select o.id o_id,
+                                             o.first_name o_first_name, 
+                                             o.last_name o_last_name,
+                                             o.address o_address,
+                                             o.city o_city,
+                                             o.telephone o_telephone,
+                                             p.*, 
+                                             t.name as type, v.pet_id, v.visit_date, v.description
+                                      from owners o
+                                      left join pets p on p.owner_id = o.id 
+                                      left join types t on p.type_id = t.id 
+                                      left join visits v on p.id = v.pet_id
+                                      where p.owner_id = ?" owner-id])]
+    (row->obj raw-owners
+      {:cols [:o_id :o_first_name :o_last_name :o_address :o_city :o_telephone]
+       :names [:id :first_name :last_name :address :city :telephone]
+       :single true
+       :specs {:pets
+               {:cols [:id :name :type :birth_date :owner_id :type_id]
+                :specs {:visits {:cols [:visit_date :pet_id :description]}}}}})))
 
 (defn find-owner-by-last-name [search-form]
-  (let [owners (j/query db-spec ["select * 
-                                    from owners 
-                                   where last_name like ? || '%' " 
+  (let [owners (j/query db-spec ["select o.id o_id,
+                                         o.first_name o_first_name, 
+                                         o.last_name o_last_name,
+                                         o.address o_address,
+                                         o.city o_city,
+                                         o.telephone o_telephone,
+                                         p.*, 
+                                         t.name as type
+                                    from owners o
+                                    left join pets p on p.owner_id = o.id 
+                                    left join types t on p.type_id = t.id  
+                                   where o.last_name like ? || '%' " 
                                  (or (get search-form "last_name") "")])]
-    (map #(assoc % :pets (j/query db-spec ["select * 
-                                              from pets 
-                                             where owner_id = ?" (:id %)])) owners)))
+    (row->obj owners
+      {:cols [:o_id :o_first_name :o_last_name :o_address :o_city :o_telephone]
+       :names [:id :first_name :last_name :address :city :telephone]
+       :specs {:pets
+               {:cols [:id :name :type :birth_date :owner_id :type_id]}}})))    
 
 (defn show-pet [owner-id pet-id]
-  (let [pet (first (j/query db-spec ["select p.*, t.name as type 
-                                        from pets p 
-                                        left join types t 
-                                          on p.type_id = t.id 
-                                       where p.id = ? 
-                                         and p.owner_id = ?" pet-id owner-id]))]
-    (assoc pet 
-      :owner (first (j/query db-spec ["select * 
-                                         from owners 
-                                        where id = ?" owner-id]))
-      :visits (j/query db-spec ["select * 
-                                   from visits 
-                                  where pet_id = ?" pet-id]))))
+  (let [pet (j/query db-spec 
+             ["select o.id o_id,
+                      o.first_name o_first_name, 
+                      o.last_name o_last_name,
+                      o.address o_address,
+                      o.city o_city,
+                      o.telephone o_telephone,
+                      p.*, 
+                      t.name as type, v.pet_id, v.visit_date, v.description 
+                 from pets p
+                 left join owners o
+                   on o.id = p.owner_id
+                 left join types t 
+                   on p.type_id = t.id
+                 left join visits v
+                   on v.pet_id = p.id
+                where p.id = ? 
+                  and p.owner_id = ?" 
+              pet-id owner-id])]
+    (row->obj pet
+      {:cols [:id :name :type :birth_date :owner_id :type_id]
+       :single true
+       :specs {:owner
+               {:cols [:o_id :o_first_name :o_last_name :o_address :o_city :o_telephone]
+                :single true
+                :names [:id :first_name :last_name :address :city :telephone]}
+               :visits
+               {:cols [:pet_id :visit_date :description]}}})))   
 
 (defn get-pet-types []
   (j/query db-spec "select * from types"))
@@ -74,14 +122,9 @@
                                 left join vet_specialties vs
                                   on v.id = vs.vet_id
                                 left join specialties s
-                                  on vs.specialty_id = s.id")
-        raw-vets (group-by #(select-keys % [:first_name :last_name :id]) raw)
-        vets (map (fn [v]
-                    (let [sp (map #(select-keys % [:name]) 
-                                  (get raw-vets v))]
-                      (assoc v :specialties sp)))
-               (keys raw-vets))]
-    vets))
+                                  on vs.specialty_id = s.id")]
+    (row->obj raw {:cols [:first_name :last_name :id]
+                   :specs {:specialties {:cols [:name]}}})))
 
 (defn add-visit [pet-id visit]
   (let [new-visit (-> visit
@@ -89,5 +132,3 @@
                     (assoc :pet_id pet-id)
                     (dissoc :id))]
     (j/insert! db-spec :visits new-visit)))
-
-

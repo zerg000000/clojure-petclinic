@@ -1,7 +1,7 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.9.0"}
         ; db related
-        org.clojure/java.jdbc {:mvn/version "0.7.4"}
+        org.clojure/java.jdbc {:mvn/version "0.7.5"}
         org.hsqldb/hsqldb {:mvn/version "2.4.0"}
         ; validation
         phrase {:mvn/version "0.1-alpha2"}

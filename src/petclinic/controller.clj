@@ -80,7 +80,7 @@
 
 (defn show-create-owner-form [_]
   (page "owners/createOrUpdateOwnerForm" 
-      {:owner (db/new-owner)
+      {:owner {:new true}
        :errors {}}))
 
 (defn create-owner [{:keys [form-params]}]
@@ -200,13 +200,13 @@
         "/find" {:get #'show-find-owners
                  :post #'find-owners}
         ["/" :owner-id]  
-        {#{"" ".json" ".xml"} (-> #'show-owner (bidi/tag :show-owner))
-          "/edit" {:get #'show-edit-owner-form
+        {"" (-> #'show-owner (bidi/tag :show-owner))
+         "/edit" {:get #'show-edit-owner-form
                    :post #'edit-owner}
-          "/pets" {"/new" {:get #'show-add-pet-form
-                           :post #'add-pet}
-                   ["/" :pet-id] 
-                   {"/edit" {:get #'show-edit-pet-form 
-                             :post #'edit-pet}
-                    "/visits/new" {:get #'show-add-visit-form 
-                                   :post #'add-visit}}}}}}])
+         "/pets" {"/new" {:get #'show-add-pet-form
+                          :post #'add-pet}
+                  ["/" :pet-id] 
+                  {"/edit" {:get #'show-edit-pet-form 
+                            :post #'edit-pet}
+                   "/visits/new" {:get #'show-add-visit-form 
+                                  :post #'add-visit}}}}}}])

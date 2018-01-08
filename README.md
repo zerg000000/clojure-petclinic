@@ -10,15 +10,15 @@ Clojure saving Java Developer from the black magic world but still keeping the p
 
 Here is the Model used in PetClinic, presenting its schema using JSON
 
-BaseEntity
-\- NamedEntity
-\-- Pet
-\-- PetType
-\-- Specialty
-\- Person
-\-- Owner
-\-- Vet
-\- Visit
+    BaseEntity
+    \- NamedEntity
+    \-- Pet
+    \-- PetType
+    \-- Specialty
+    \- Person
+    \-- Owner
+    \-- Vet
+    \- Visit
 
 
 |  Type    |   JSON sample |
@@ -75,7 +75,7 @@ BaseEntity
 
 ### Compile LESS to CSS
 
-    clj less.clj
+    clj -R:less less.clj
 
 ### REPL
 
@@ -103,7 +103,7 @@ BaseEntity
 
 ## Report Bugs
 
-It is just a weekend project. It might contains quite lots of bugs. feel free to report them in Github, thanks.
+It is just a weekend project. It might contains quite lots of bugs. Feel free to report them in Github, thanks.
 
 ## License
 

@@ -96,6 +96,10 @@ Here is the Model used in PetClinic, presenting its schema using JSON
     clj -R:dev -R:editor -m nightlight.core
     open http://localhost:4000/
 
+### Package as uberjar
+    
+    sh uberjar.sh
+    java -jar uberjar.jar -m petclinic.core prod
 
 ## Incompatible changes
 

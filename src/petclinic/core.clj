@@ -1,13 +1,11 @@
 (ns petclinic.core
   (:require [bidi.bidi :as bidi]
             [petclinic.thymeleaf :as thymeleaf]
-            [ring.adapter.jetty :as jetty]
+            [aleph.http :as http]
             [ring.middleware.webjars :as webjars]
             [ring.middleware.resource :as resource]
             [ring.middleware.content-type :as content-type]
             [ring.middleware.params :as params]
-            [ring.middleware.reload :as reload]
-            [ring.middleware.stacktrace :as stacktrace]
             [petclinic.controller :as c])
   (:gen-class))
 
@@ -34,8 +32,11 @@
   (let [mode (or (first args) "dev")
         real-app (if (= "prod" mode)
                    app
-                   (-> #'app
-                     (reload/wrap-reload '[petclinic.core])
-                     (stacktrace/wrap-stacktrace)))]  
+                   (do
+                     (use '[ring.middleware.reload])
+                     (use '[ring.middleware.stacktrace])
+                     (-> #'app
+                       ((resolve 'wrap-reload) '[petclinic.core])
+                       ((resolve 'wrap-stacktrace)))))]  
     (println "production mode: " mode)
-    (jetty/run-jetty real-app {:port 3000})))
+    (http/start-server real-app {:port 3000})))

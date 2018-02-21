@@ -4,10 +4,10 @@
         org.clojure/java.jdbc {:mvn/version "0.7.5"}
         org.hsqldb/hsqldb {:mvn/version "2.4.0"}
         ; validation
-        phrase {:mvn/version "0.1-alpha2"}
+        phrase {:mvn/version "0.3-alpha3"}
         ; route / web server
         bidi {:mvn/version "2.1.2"}
-        ring/ring-jetty-adapter {:mvn/version "1.6.3"}
+        aleph {:mvn/version "0.4.4"}
         org.slf4j/slf4j-nop {:mvn/version "1.7.25"}
         cheshire {:mvn/version "5.8.0"}
         ; template engine

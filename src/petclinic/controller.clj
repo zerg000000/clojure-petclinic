@@ -191,22 +191,22 @@
 
 (def routes
   ["/"
-    {#{"" "/"} #'welcome
-     ["vets." :export-format] #'vets
-     "owners" 
-      {#{"" "/"} #'find-owners
-        "/new" {:get #'show-create-owner-form
-                :post #'create-owner}
-        "/find" {:get #'show-find-owners
-                 :post #'find-owners}
-        ["/" :owner-id]  
-        {"" (-> #'show-owner (bidi/tag :show-owner))
-         "/edit" {:get #'show-edit-owner-form
-                   :post #'edit-owner}
-         "/pets" {"/new" {:get #'show-add-pet-form
-                          :post #'add-pet}
-                  ["/" :pet-id] 
-                  {"/edit" {:get #'show-edit-pet-form 
-                            :post #'edit-pet}
-                   "/visits/new" {:get #'show-add-visit-form 
-                                  :post #'add-visit}}}}}}])
+    [[#{"" "/"} #'welcome]
+     [["vets." :export-format] #'vets]
+     ["owners" 
+      [[#{"" "/"} #'find-owners]
+       ["/new" {:get #'show-create-owner-form
+                :post #'create-owner}]
+       ["/find" {:get #'show-find-owners
+                 :post #'find-owners}]
+       [["/" :owner-id]  
+        [["" (-> #'show-owner (bidi/tag :show-owner))]
+         ["/edit" {:get #'show-edit-owner-form
+                   :post #'edit-owner}]
+         ["/pets" [["/new" {:get #'show-add-pet-form
+                            :post #'add-pet}]
+                   [["/" :pet-id] 
+                    [["/edit" {:get #'show-edit-pet-form 
+                               :post #'edit-pet}]
+                     ["/visits/new" {:get #'show-add-visit-form 
+                                     :post #'add-visit}]]]]]]]]]]])

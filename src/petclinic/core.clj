@@ -7,6 +7,7 @@
             [ring.middleware.content-type :as content-type]
             [ring.middleware.params :as params]
             [petclinic.controller :as c])
+  (:import [io.netty.handler.stream ChunkedWriteHandler])
   (:gen-class))
 
 (defn wrap-bidi [handler routes]
@@ -39,4 +40,4 @@
                        ((resolve 'wrap-reload) '[petclinic.core])
                        ((resolve 'wrap-stacktrace)))))]  
     (println "production mode: " mode)
-    (http/start-server real-app {:port 3000})))
+    (http/start-server real-app {:port 3000 :compression? true})))

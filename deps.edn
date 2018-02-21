@@ -7,7 +7,7 @@
         phrase {:mvn/version "0.3-alpha3"}
         ; route / web server
         bidi {:mvn/version "2.1.2"}
-        aleph {:mvn/version "0.4.4"}
+        aleph {:mvn/version "0.4.5-alpha4"}
         org.slf4j/slf4j-nop {:mvn/version "1.7.25"}
         cheshire {:mvn/version "5.8.0"}
         ; template engine

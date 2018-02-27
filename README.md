@@ -97,7 +97,7 @@ Here is the Model used in PetClinic, presenting its schema using JSON
 
 ### Trying the project without installing any extra editor
 
-    clj -R:dev -R:editor -m nightlight.core
+    clj -R:dev -A:editor
     open http://localhost:4000/
 
 ### Package as uberjar

@@ -45,7 +45,9 @@
    :headers {"Content-Type" "application/xml"}
    :body (with-out-str (xml/emit-element (vets->xml data)))})
 
-(defn process-if-valid [spec form success-fn fail-fn]
+(defn if-valid 
+  "valid form against the given spec"
+  [spec form success-fn fail-fn]
   (let [clojure-form (walk/keywordize-keys form)
         errors (s/explain-data spec clojure-form)]
     (if errors
@@ -84,13 +86,13 @@
        :errors {}}))
 
 (defn create-owner [{:keys [form-params]}]
-  (process-if-valid
+  (if-valid
     :petclinic/owner
     form-params
     (fn [form]
       (let [new (db/create-owner form)]
         (response/redirect (bidi/path-for routes :show-owner
-                              :owner-id (-> new first vals first)))))
+                             :owner-id (-> new first vals first)))))
     (fn [form errors]
       (page "owners/createOrUpdateOwnerForm"
         {:owner  form
@@ -103,13 +105,13 @@
 
 (defn edit-owner [{{:keys [owner-id]} :route-params
                    form-params :form-params}]
-  (process-if-valid
+  (if-valid
     :petclinic/owner
     (assoc form-params :id owner-id)
     (fn [form]
       (db/edit-owner form)
       (response/redirect (bidi/path-for routes :show-owner
-                            :owner-id owner-id)))
+                           :owner-id owner-id)))
     (fn [form errors]
       (page "owners/createOrUpdateOwnerForm")
       {:owner (merge (db/show-owner owner-id) form)
@@ -123,7 +125,7 @@
 
 (defn add-pet [{{:keys [owner-id]} :route-params
                 form-params :form-params}]
-  (process-if-valid
+  (if-valid
     :petclinic/pet
     (-> form-params
         (assoc  :owner_id owner-id)
@@ -131,7 +133,7 @@
     (fn [form] 
       (db/add-pet (str->int owner-id) form)
       (response/redirect (bidi/path-for routes :show-owner
-                            :owner-id owner-id)))
+                           :owner-id owner-id)))
     (fn [form errors]
       (page "pets/createOrUpdatePetForm"
         {:pet (assoc form :owner (db/show-owner owner-id))
@@ -148,18 +150,18 @@
 
 (defn edit-pet [{{:keys [owner-id pet-id]} :route-params
                  form-params :form-params}]
-  (process-if-valid
+  (if-valid
     :petclinic/pet
     (assoc form-params
-        :owner_id owner-id
-        :id pet-id)
+      :owner_id owner-id
+      :id pet-id)
     (fn [form]
       (db/edit-pet form) 
       (response/redirect (bidi/path-for routes :show-owner :owner-id (:owner_id form))))
     (fn [form errors]
       (page "pets/createOrUpdatePetForm"
         {:pet (merge (db/show-pet (:owner_id form)
-                                  (:pet_id form)) form)
+                       (:pet_id form)) form)
          :errors errors
          :types (db/get-pet-types)}))))
 
@@ -172,19 +174,19 @@
 
 (defn add-visit [{{:keys [owner-id pet-id]} :route-params
                   form-params :form-params}]
-  (process-if-valid
+  (if-valid
     :petclinic/visit
     form-params
     (fn [form]
       (db/add-visit (str->int pet-id) form)
       (response/redirect (bidi/path-for routes :show-owner
-                            :owner-id owner-id)))
+                           :owner-id owner-id)))
     (fn [form errors]
       (page "pets/createOrUpdateVisitForm"
         {:visit form
          :errors errors
          :pet (db/show-pet (str->int owner-id)
-                           (str->int pet-id))}))))
+                (str->int pet-id))}))))
 
 (defn server-error-page [req]
   (page "error" {:message (with-out-str (pp/pprint req))}))

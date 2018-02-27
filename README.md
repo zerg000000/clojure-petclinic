@@ -91,6 +91,10 @@ Here is the Model used in PetClinic, presenting its schema using JSON
 
     clj -m petclinic.core prod
 
+### Running Tests
+
+    clj -Atest
+
 ### Trying the project without installing any extra editor
 
     clj -R:dev -R:editor -m nightlight.core
@@ -98,8 +102,8 @@ Here is the Model used in PetClinic, presenting its schema using JSON
 
 ### Package as uberjar
     
-    sh uberjar.sh
-    java -jar uberjar.jar -m petclinic.core prod
+    clj -Apack
+    java -jar dist/uberjar.jar -m petclinic.core prod
 
 ## Incompatible changes
 

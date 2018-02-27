@@ -39,5 +39,5 @@
                      (-> #'app
                        ((resolve 'wrap-reload) '[petclinic.core])
                        ((resolve 'wrap-stacktrace)))))]  
-    (println "production mode: " mode)
+    (println "mode: " mode)
     (http/start-server real-app {:port 3000 :compression? true})))
